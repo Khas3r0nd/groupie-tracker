@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/static/artist.css">
+	<title>Groupies</title>
+</head>
+
+<body>
+	<h1><a href="/">Groupie Trackers</a></h1>
+	<div class="artist">
+		<img src="{{.Image}}">
+		<div class="card-body">
+			<h3 class="card-title">{{.Name}}</h3>
+		</div>
+		<iframe style="border-radius:12px" src="{{.MusicLink}}" width="35%" height="352" frameBorder="0"
+			allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+			loading="lazy"></iframe>
+		<table>
+			<tr>
+				<td>CreationDate:</td>
+				<td>{{.CreationDate}}</td>
+			</tr>
+			<tr>
+				<td>Members:</td>
+				<td>
+					<ul>
+						{{- range $index, $element := .Members }}
+						<li>{{$element}}</li>
+						{{- end }}
+					</ul>
+				</td>
+			</tr>
+			<tr>
+				<td>First album:</td>
+				<td>{{.FirstAlbum}}</td>
+			</tr>
+			<tr>
+				<td>Upcoming events:</td>
+				<td>
+					<ul>
+						{{- range $key, $value := .Relation.Relations }}
+						<li>
+							{{$key}}:
+							<ul>
+								{{- range $index, $location := $value }}
+								<li>{{$location}}</li>
+								{{- end }}
+							</ul>
+						</li>
+						{{- end }}
+					</ul>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+</body>
+
+</html>

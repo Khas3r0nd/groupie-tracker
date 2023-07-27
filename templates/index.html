@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Groupie Trackers</title>
+
+	<link rel="stylesheet" href="static/style.css">
+
+</head>
+
+<body>
+	<h1><a href="/">Groupie Trackers</a></h1>
+	<div class="container">
+		<!-- Based on this excellent demo: https://codeconvey.com/pure-css-range-slider-with-2-handles/ -->
+
+		<div class="search-container">
+			<form id="search-form" action="/search" method="GET">
+				<!-- search button -->
+				<input id="search-input" type="text" name="text" list="artist" placeholder="Start typing">
+				<button id="search-button" type="submit">Search</button>
+				<datalist id="artist">
+					{{range .Groups}}
+
+					<option value="{{ .Name }}">{{ .Name}} -artist/band_name</option>
+
+					{{range .Members}}
+
+					<option value="{{.}}">{{.}} -member</option>
+
+					{{end}}
+
+					{{range $key, $value := .Relation.Relations}}
+
+					<option value="{{$key}}">{{$key}} location</option>
+
+					<option value="{{$value}}">{{$value}} - Concert_Date</option>
+					{{end}}
+
+					<option value="{{.CreationDate}}">
+						{{.CreationDate}} - Creation_date
+					</option>
+
+					<option value="{{.FirstAlbum}}">{{.FirstAlbum}} - First_Album</option>
+
+					{{end}}
+				</datalist>
+				<div class="filter-container">
+					<h2>First Album year</h2>
+					<!-- First album -->
+					<div class="range-slider-container">
+						<div id="RangeSlider" class="range-slider">
+							<div>
+								<div class="range-slider-val-left"></div>
+								<div class="range-slider-val-right"></div>
+								<div class="range-slider-val-range"></div>
+
+								<span class="range-slider-handle range-slider-handle-left"></span>
+								<span class="range-slider-handle range-slider-handle-right"></span>
+
+								<div class="range-slider-tooltip range-slider-tooltip-left">
+									<span class="range-slider-tooltip-text"></span>
+								</div>
+
+								<div class="range-slider-tooltip range-slider-tooltip-right">
+									<span class="range-slider-tooltip-text"></span>
+								</div>
+							</div>
+
+							<input type="range" name="low-rangeAlbum" class="range-slider-input-left" tabindex="0"
+								max="{{index .MinAndMaxAlbumDate 1}}" min="{{index .MinAndMaxAlbumDate 0}}" step="1">
+							<input type="range" name="high-rangeAlbum" class="range-slider-input-right" tabindex="0"
+								max="{{index .MinAndMaxAlbumDate 1}}" min="{{index .MinAndMaxAlbumDate 0}}" step="1">
+						</div>
+						<!-- Replace your existing checkbox input with the following markup -->
+						<label class="switch">
+							<input type="checkbox" id="AlbumDateFilter" name="AlbumDateFilter">
+							<span class="slider"></span>
+						</label>
+
+					</div>
+				</div>
+
+				<div class="filter-container">
+					<!-- Creation date -->
+					<h2>Creation date filter</h2>
+					<div class="range-slider-container">
+						<div id="RangeSlider2" class="range-slider">
+							<div>
+								<div class="range-slider-val-left"></div>
+								<div class="range-slider-val-right"></div>
+								<div class="range-slider-val-range"></div>
+
+								<span class="range-slider-handle range-slider-handle-left"></span>
+								<span class="range-slider-handle range-slider-handle-right"></span>
+
+								<div class="range-slider-tooltip range-slider-tooltip-left">
+									<span class="range-slider-tooltip-text"></span>
+								</div>
+
+								<div class="range-slider-tooltip range-slider-tooltip-right">
+									<span class="range-slider-tooltip-text"></span>
+								</div>
+							</div>
+
+							<input type="range" name="low-rangeCreation" class="range-slider-input-left" tabindex="0"
+								max="{{index .MinAndMaxCreationDate 1}}" min="{{index .MinAndMaxCreationDate 0}}"
+								step="1">
+							<input type="range" name="high-rangeCreation" class="range-slider-input-right" tabindex="0"
+								max="{{index .MinAndMaxCreationDate 1}}" min="{{index .MinAndMaxCreationDate 0}}"
+								step="1">
+						</div>
+						<label class="switch">
+							<input type="checkbox" id="CreationDateFilter" name="CreationDateFilter">
+							<span class="slider"></span>
+						</label>
+					</div>
+				</div>
+
+				<div class="filter-container">
+					<!-- 8 members -->
+					<div class="members">
+						<h2>Members filter</h2>
+						{{- range $index := loop 1 .MaxArtists }}
+						<input type="checkbox" id="MemberCount" name="MemberCountFilter" value="{{$index}}">
+						<p>{{$index}}</p>
+						{{- end }}
+
+					</div>
+				</div>
+				<div class="filter-container">
+					<h2>Location filter</h2>
+					<div id="countriesList">
+						{{range $country, $cities := .CountriesMap}}
+						<div class="country">
+							<input type="checkbox" class="country-checkbox" name="countries" value="{{$country}}">
+							<label class="country-label">{{$country}}</label>
+						</div>
+						<div class="cities" style="display: none;">
+							<div class="city">
+								{{range $city := $cities}}
+								<input type="checkbox" class="city-checkbox" name="cities" value="{{$city}}">
+								<label>{{$city}}</label>
+								{{end}}
+							</div>
+						</div>
+						<br> <!-- Add a line break after each country -->
+						{{end}}
+					</div>
+				</div>
+
+
+			</form>
+		</div>
+		<!-- ряд -->
+		<div class="row">
+			{{range .Groups}}
+			<div class="card">
+				<a href="/artists?id={{.Id}}">
+					<div class="card-image">
+						<img src="{{.Image}}" class="card-img-top" alt="...">
+						<div class="font">
+							<div class="card-name">{{.Name}}</div>
+							<div class="card-album">First album: {{.FirstAlbum}}</div>
+						</div>
+					</div>
+				</a>
+			</div>
+			{{end}}
+		</div>
+
+
+	</div>
+</body>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		var countryCheckboxes = document.querySelectorAll(".country-checkbox");
+		var cityCheckboxes = document.querySelectorAll(".city-checkbox");
+
+		for (var i = 0; i < countryCheckboxes.length; i++) {
+			countryCheckboxes[i].addEventListener("change", toggleCitiesVisibility);
+		}
+
+		for (var j = 0; j < cityCheckboxes.length; j++) {
+			cityCheckboxes[j].addEventListener("change", checkCountryCheckbox);
+		}
+
+		addCountryLabelListeners(); // Add the listener for country labels
+	});
+
+	function toggleCitiesVisibility() {
+		var citiesDiv = this.parentNode.nextElementSibling;
+		var citiesCheckboxes = citiesDiv.querySelectorAll(".city-checkbox");
+
+		if (this.checked) {
+			citiesDiv.style.display = "block";
+		} else {
+			citiesDiv.style.display = "none";
+		}
+	}
+
+	function checkCountryCheckbox() {
+		var citiesDiv = this.closest(".cities");
+		var countryCheckbox = citiesDiv.previousElementSibling.querySelector(".country-checkbox");
+		var cityCheckboxes = citiesDiv.querySelectorAll(".city-checkbox");
+
+		var isChecked = false;
+
+		for (var i = 0; i < cityCheckboxes.length; i++) {
+			if (cityCheckboxes[i].checked) {
+				isChecked = true;
+				break;
+			}
+		}
+
+		countryCheckbox.checked = isChecked;
+	}
+
+	// Add event listener to countries checkboxes
+	function addCountryCheckboxListeners() {
+		const countryCheckboxes = document.querySelectorAll(".country-checkbox");
+		countryCheckboxes.forEach((countryCheckbox) => {
+			countryCheckbox.addEventListener("change", function () {
+				const cities = this.parentElement.nextElementSibling.querySelectorAll(
+					".city-checkbox"
+				);
+				cities.forEach((city) => {
+					city.checked = this.checked;
+				});
+			});
+		});
+	}
+
+	// Uncheck country checkbox when the country label is clicked
+	function addCountryLabelListeners() {
+		const countryLabels = document.querySelectorAll(".country-label");
+		countryLabels.forEach((countryLabel) => {
+			countryLabel.addEventListener("click", function (event) {
+				event.preventDefault(); // Prevent the default checkbox behavior
+				const countryCheckbox = this.previousElementSibling;
+				const citiesDiv = countryCheckbox.parentElement.nextElementSibling;
+				const citiesCheckboxes = citiesDiv.querySelectorAll(".city-checkbox");
+
+				if (citiesDiv.style.display === "none") {
+					citiesDiv.style.display = "block";
+					this.classList.add("open");
+				} else {
+					citiesDiv.style.display = "none";
+					this.classList.remove("open");
+
+					var allCitiesUnchecked = true;
+					for (var i = 0; i < citiesCheckboxes.length; i++) {
+						if (citiesCheckboxes[i].checked) {
+							allCitiesUnchecked = false;
+							break;
+						}
+					}
+
+					countryCheckbox.checked = !allCitiesUnchecked;
+				}
+			});
+		});
+	}
+
+	addCountryCheckboxListeners();
+</script>
+
+<script>
+	/** Default config */
+	const rangeSliderMinAlbum = {{ index .AlbumRanges 0}};
+	const rangeSliderMaxAlbum = {{ index .AlbumRanges 1}};
+	const minBoundAlbum = {{ index .MinAndMaxAlbumDate 0}};
+	const maxBoundAlbum = {{ index .MinAndMaxAlbumDate 1}};
+
+	const rangeAlbum = maxBoundAlbum - minBoundAlbum;
+
+	document.querySelector('#RangeSlider .range-slider-val-left').style.width = `${((rangeSliderMinAlbum - minBoundAlbum) / rangeAlbum) * 100}%`;
+	document.querySelector('#RangeSlider .range-slider-val-right').style.width = `${((rangeSliderMaxAlbum - minBoundAlbum) / rangeAlbum) * 100}%`;
+
+	document.querySelector('#RangeSlider .range-slider-val-range').style.left = `${((rangeSliderMinAlbum - minBoundAlbum) / rangeAlbum) * 100}%`;
+	document.querySelector('#RangeSlider .range-slider-val-range').style.right = `${100 - ((rangeSliderMaxAlbum - minBoundAlbum) / rangeAlbum) * 100}%`;
+
+	document.querySelector('#RangeSlider .range-slider-handle-left').style.left = `${((rangeSliderMinAlbum - minBoundAlbum) / rangeAlbum) * 100}%`;
+	document.querySelector('#RangeSlider .range-slider-handle-right').style.left = `${((rangeSliderMaxAlbum - minBoundAlbum) / rangeAlbum) * 100}%`;
+
+	document.querySelector('#RangeSlider .range-slider-tooltip-left').style.left = `${((rangeSliderMinAlbum - minBoundAlbum) / rangeAlbum) * 100}%`;
+	document.querySelector('#RangeSlider .range-slider-tooltip-right').style.left = `${((rangeSliderMaxAlbum - minBoundAlbum) / rangeAlbum) * 100}%`;
+
+	document.querySelector('#RangeSlider .range-slider-tooltip-left .range-slider-tooltip-text').innerText = rangeSliderMinAlbum;
+	document.querySelector('#RangeSlider .range-slider-tooltip-right .range-slider-tooltip-text').innerText = rangeSliderMaxAlbum;
+
+	document.querySelector('#RangeSlider .range-slider-input-left').value = rangeSliderMinAlbum;
+	document.querySelector('#RangeSlider .range-slider-input-left').addEventListener('input', e => {
+		e.target.value = Math.min(e.target.value, e.target.parentNode.childNodes[5].value - 1);
+		var value = ((parseInt(e.target.value) - minBoundAlbum) / rangeAlbum) * 100;
+
+		var children = e.target.parentNode.childNodes[1].childNodes;
+		children[1].style.width = `${value}%`;
+		children[5].style.left = `${value}%`;
+		children[7].style.left = `${value}%`;
+		children[11].style.left = `${value}%`;
+
+		children[11].childNodes[1].innerHTML = e.target.value;
+	});
+
+	document.querySelector('#RangeSlider .range-slider-input-right').value = rangeSliderMaxAlbum;
+	document.querySelector('#RangeSlider .range-slider-input-right').addEventListener('input', e => {
+		e.target.value = Math.max(e.target.value, e.target.parentNode.childNodes[3].value - (-1));
+		var value = ((parseInt(e.target.value) - minBoundAlbum) / rangeAlbum) * 100;
+
+		var children = e.target.parentNode.childNodes[1].childNodes;
+		children[3].style.width = `${100 - value}%`;
+		children[5].style.right = `${100 - value}%`;
+		children[9].style.left = `${value}%`;
+		children[13].style.left = `${value}%`;
+
+		children[13].childNodes[1].innerHTML = e.target.value;
+	});
+
+
+</script>
+<script>
+	/** Default config */
+	const rangeSlider_min = {{ index .CreationRanges 0}};
+	const rangeSlider_max = {{ index .CreationRanges 1}};
+	const minBound = {{ index .MinAndMaxCreationDate 0}};
+	const maxBound = {{ index .MinAndMaxCreationDate 1}};
+
+	const range = maxBound - minBound;
+
+	document.querySelector('#RangeSlider2 .range-slider-val-left').style.width = `${((rangeSlider_min - minBound) / range) * 100}%`;
+	document.querySelector('#RangeSlider2 .range-slider-val-right').style.width = `${((rangeSlider_max - minBound) / range) * 100}%`;
+
+	document.querySelector('#RangeSlider2 .range-slider-val-range').style.left = `${((rangeSlider_min - minBound) / range) * 100}%`;
+	document.querySelector('#RangeSlider2 .range-slider-val-range').style.right = `${100 - ((rangeSlider_max - minBound) / range) * 100}%`;
+
+	document.querySelector('#RangeSlider2 .range-slider-handle-left').style.left = `${((rangeSlider_min - minBound) / range) * 100}%`;
+	document.querySelector('#RangeSlider2 .range-slider-handle-right').style.left = `${((rangeSlider_max - minBound) / range) * 100}%`;
+
+	document.querySelector('#RangeSlider2 .range-slider-tooltip-left').style.left = `${((rangeSlider_min - minBound) / range) * 100}%`;
+	document.querySelector('#RangeSlider2 .range-slider-tooltip-right').style.left = `${((rangeSlider_max - minBound) / range) * 100}%`;
+
+	document.querySelector('#RangeSlider2 .range-slider-tooltip-left .range-slider-tooltip-text').innerText = rangeSlider_min;
+	document.querySelector('#RangeSlider2 .range-slider-tooltip-right .range-slider-tooltip-text').innerText = rangeSlider_max;
+
+	document.querySelector('#RangeSlider2 .range-slider-input-left').value = rangeSlider_min;
+	document.querySelector('#RangeSlider2 .range-slider-input-left').addEventListener('input', e => {
+		e.target.value = Math.min(e.target.value, e.target.parentNode.childNodes[5].value - 1);
+		var value = ((parseInt(e.target.value) - minBound) / range) * 100;
+
+		var children = e.target.parentNode.childNodes[1].childNodes;
+		children[1].style.width = `${value}%`;
+		children[5].style.left = `${value}%`;
+		children[7].style.left = `${value}%`;
+		children[11].style.left = `${value}%`;
+
+		children[11].childNodes[1].innerHTML = e.target.value;
+	});
+
+	document.querySelector('#RangeSlider2 .range-slider-input-right').value = rangeSlider_max;
+	document.querySelector('#RangeSlider2 .range-slider-input-right').addEventListener('input', e => {
+		e.target.value = Math.max(e.target.value, e.target.parentNode.childNodes[3].value - (-1));
+		var value = ((parseInt(e.target.value) - minBound) / range) * 100;
+
+		var children = e.target.parentNode.childNodes[1].childNodes;
+		children[3].style.width = `${100 - value}%`;
+		children[5].style.right = `${100 - value}%`;
+		children[9].style.left = `${value}%`;
+		children[13].style.left = `${value}%`;
+
+		children[13].childNodes[1].innerHTML = e.target.value;
+	});
+</script>
+<script>
+	const creationDateCheck = document.getElementById('CreationDateFilter');
+	const albumDateCheck = document.getElementById('AlbumDateFilter');
+	const memberCountCheckboxes = document.getElementsByName('MemberCountFilter');
+
+	// Check if a value exists in the local storage for CreationDateFilter
+	if (localStorage.getItem('creationCheckbox')) {
+		// Set the CreationDateFilter checkbox to the stored value
+		creationDateCheck.checked = localStorage.getItem('creationCheckbox') === 'true';
+	}
+
+	// Check if a value exists in the local storage for AlbumDateFilter
+	if (localStorage.getItem('albumCheckbox')) {
+		// Set the AlbumDateFilter checkbox to the stored value
+		albumDateCheck.checked = localStorage.getItem('albumCheckbox') === 'true';
+	}
+
+	// Check if values exist in the local storage for MemberCountFilter checkboxes
+	if (localStorage.getItem('memberCountCheckboxes')) {
+		const storedCheckboxes = JSON.parse(localStorage.getItem('memberCountCheckboxes'));
+		for (let i = 0; i < memberCountCheckboxes.length; i++) {
+			const checkbox = memberCountCheckboxes[i];
+			checkbox.checked = storedCheckboxes.includes(checkbox.value);
+		}
+	}
+
+	// Listen for change events on the CreationDateFilter checkbox
+	creationDateCheck.addEventListener('change', function () {
+		// Store the CreationDateFilter checkbox state in the local storage
+		localStorage.setItem('creationCheckbox', creationDateCheck.checked);
+	});
+
+	// Listen for change events on the AlbumDateFilter checkbox
+	albumDateCheck.addEventListener('change', function () {
+		// Store the AlbumDateFilter checkbox state in the local storage
+		localStorage.setItem('albumCheckbox', albumDateCheck.checked);
+	});
+
+	// Listen for change events on the MemberCountFilter checkboxes
+	for (let i = 0; i < memberCountCheckboxes.length; i++) {
+		const checkbox = memberCountCheckboxes[i];
+		checkbox.addEventListener('change', function () {
+			// Get the stored checkboxes from the local storage or initialize an empty array
+			let storedCheckboxes = JSON.parse(localStorage.getItem('memberCountCheckboxes')) || [];
+
+			if (checkbox.checked) {
+				// Add the value of the checked checkbox to the stored checkboxes
+				storedCheckboxes.push(checkbox.value);
+			} else {
+				// Remove the value of the unchecked checkbox from the stored checkboxes
+				const index = storedCheckboxes.indexOf(checkbox.value);
+				if (index !== -1) {
+					storedCheckboxes.splice(index, 1);
+				}
+			}
+
+			// Store the updated checkboxes in the local storage
+			localStorage.setItem('memberCountCheckboxes', JSON.stringify(storedCheckboxes));
+		});
+	}
+</script>
+
+
+
+</html>
